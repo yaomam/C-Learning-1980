@@ -1,0 +1,10 @@
+terminal 用命令 nano 260329.txt
+
+这里输入文字，
+这是记录了今天的C语言学习的心得
+
+在xcode里逐行抄写gemini生成的代码，并以/* */注释中尝试理解每一个细节
+
+command +s 会存成terminal seve output。txt
+
+ctrl+o 是保存
