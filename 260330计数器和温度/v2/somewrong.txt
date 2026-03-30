@@ -1,0 +1,52 @@
+我用一个if 套进了一个while，while分为三种情况，再用else包回来
+
+这个逻辑又重复，没有gemini原始提供的精简，将来需要复盘的话，可以参考下面的代码
+
+另，count数量不对，后续要抓虫的话，可以想想看为什么？
+
+#include "main.h"
+
+int main() {
+    char choice = 'y'; // 初始为 y，确保循环开始
+    int count = 0;     // 统计员
+    float input_v, output_v;
+    int mode;
+
+    printf("%s\n", APP_TITLE);
+
+    // 只要 choice 是 y 或 Y，就一直运行
+    while (choice == 'y' || choice == 'Y') {
+        count++; // 每次循环，计数加 1
+        
+        printf("\n=== 第 %d 次计算开始 ===\n", count);
+        printf("请选择模式 (1:C->F, 2:F->C): ");
+        scanf("%d", &mode);
+
+        if (mode == 1) {
+            printf("请输入摄氏度: ");
+            scanf("%f", &input_v);
+            output_v = input_v * 1.8 + 32;
+            printf("结果: %.2f°C = %.2f°F\n", input_v, output_v);
+        } else if (mode == 2) {
+            printf("请输入华氏度: ");
+            scanf("%f", &input_v);
+            output_v = (input_v - 32) / 1.8;
+            printf("结果: %.2f°F = %.2f°C\n", input_v, output_v);
+        } else {
+            printf("错误：无效模式！\n");
+            count--; // 错误输入不计入统计
+        }
+
+        // 关键一步：询问是否继续
+        printf("\n还需要继续吗？(y/n): ");
+        scanf(" %c", &choice); // 注意 %c 前面的空格，用来吸收回车符
+    }
+
+    printf("\n任务结束。你本次一共处理了 %d 个数据。再见！\n", count);
+    return 0;
+}
+
+
+以上，是原始的代码
+
+20260330
