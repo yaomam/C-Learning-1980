@@ -3,9 +3,6 @@
 
 #include <stdio.h>
 //对于#的使用，是否都是一次性的？#if-not-define #define #include <some.h>，一次读取就行了，下次运行再读一次,另外，#后不用；
-#include <string.h>
-//#include <string.h>，是为了载入一个字符串，为了输入密码
-
 
 //---baisc Info---
 #define BANK_NAME "通用银行（GBNK）"
@@ -18,8 +15,6 @@
 
 #define START_BALANCE 1000.00
 /*此处定义初始金额，1000.00，但gemini写的是1000.0，有差别吗？在后续的f定义中应该要定义小数点后5位，否则无法计算取出小数点后2位时的对应利润*/
-
-#define SET_PASSWORD 888888
 
 #endif
 
