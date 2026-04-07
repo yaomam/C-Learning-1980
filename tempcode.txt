@@ -1,0 +1,86 @@
+#include "main.h"
+
+// --- 模块 A：严谨的地图生成器 ---
+void setup_map(int *map) {
+    // 1. 初始化：先在数组前50个位子填1（有地鼠），后50个填0（空的）
+    for (int i = 0; i < GRID_SIZE; i++) {
+        if (i < MOLE_COUNT) {
+            map[i] = 1; // 填充地鼠
+        } else {
+            map[i] = 0; // 填充空地
+        }
+    }
+
+    // 2. 洗牌逻辑：这是最严谨的部分，确保地鼠被随机“摇匀”
+    // 从最后一个格子开始，向前循环
+    for (int i = GRID_SIZE - 1; i > 0; i--) {
+        // 随机产生一个 0 到 i 之间的索引位置
+        int j = rand() % (i + 1);
+        
+        // 交换第 i 个和第 j 个格子的内容
+        int temp = map[i]; 
+        map[i] = map[j];
+        map[j] = temp;
+    }
+}
+
+// --- 模块 C：主执行与指针探查逻辑 ---
+int main() {
+    int grid[GRID_SIZE]; // 声明100个格子的数组（也就是你的Excel表格）
+    int found = 0;       // 计数器：累计发现的地鼠
+    int miss = 0;        // 计数器：累计发现的空地
+    
+    // --- 第一步：准备地图 ---
+    srand(time(NULL));   // 用当前时间播种，确保每次运行的地鼠位置都不一样
+    setup_map(grid);     // 调用模块 A 铺设地图
+
+    // --- 第二步：建立多级指针（你的“鼠标系统”） ---
+    int *arrow = grid;   // 一级指针（箭头）：初始指向数组的第一个格子地址
+    int **mouse = &arrow;// 二级指针（鼠标）：控制“箭头”这个变量本身的地址
+
+    printf("--- 10x10 地鼠探测器启动 (总量: 50只地鼠) ---\n\n");
+
+    // --- 第三步：开始线性探测 ---
+    for (int i = 0; i < GRID_SIZE; i++) {
+        // 1. 一级指针探查：看当前箭头指的内容
+        // 使用 **mouse 穿透两层，直接读取格子里的 0 或 1
+        if (**mouse == 1) {
+            found++; // 发现地鼠，加1
+            printf("步数 %02d | 地址 %p | 内容: [ 🐹 地鼠 ] (累计: %d)\n", 
+i + 1, *mouse, found);
+        } else {
+            miss++;  // 空地，加1
+            printf("步数 %02d | 地址 %p | 内容: [ 🕳️ 空地 ] (累计: %d)\n", 
+i + 1, *mouse, miss);
+        }
+
+        // 2. 智能终止逻辑 (你的核心思考点)
+        // 既然总数是100且比例是50:50，一旦一方满50，剩下的必然全是另一方
+        if (found == MOLE_COUNT || miss == (GRID_SIZE - MOLE_COUNT)) {
+            printf("\n--- 探测智慧终止！---\n");
+            printf("原因：已确认 50 个结果，剩下的必然是 %s。\n", found == 
+50 ? "空地" : "地鼠");
+            printf("最终步数统计: %d 步 (节省了 %d 步)\n", i + 1, 
+GRID_SIZE - (i + 1));
+            break; // 退出循环
+        }
+
+        // 3. 移动鼠标：通过修改“箭头”中存储的地址，使其指向下一个格子
+        // 这里的 +1 是指针运算，系统会自动移动到一个 int 大小的字节位置
+        *mouse = *mouse + 1; 
+    }
+
+    // --- 第四步：将最终结果持久化 ---
+    FILE *f_map = fopen(MAP_FILE, "w"); // 用 "w" 模式创建或清空文件
+    if (f_map != NULL) {
+        for (int i = 0; i < GRID_SIZE; i++) {
+            fprintf(f_map, "%d ", grid[i]); // 把打乱后的地图存进文本文件
+            if ((i + 1) % 10 == 0) fprintf(f_map, "\n"); // 
+每10个换一行，存成 10x10 的样子
+        }
+        fclose(f_map);
+        printf("\n地图快照已存入: %s\n", MAP_FILE);
+    }
+
+    return 0;
+}
